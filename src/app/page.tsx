@@ -1,10 +1,23 @@
 import { Button } from '@/components/Button'
-import Image from 'next/image'
+import { Input } from '@/components/Input'
+import { db } from '@/server/db/db'
+import { User } from '@/server/db/schema'
 
-export default function Home() {
+export default async function Home() {
+  console.info(db.query)
+  const users = await db.select().from(User).limit(10)
   return (
-    <div>
-      <Button>button</Button>
+    <div className="h-screen flex justify-center items-center">
+      <form className="w-full max-w-md flex flex-col gap-4">
+        <h1 className="text-center text-2xl font-bold">Create App</h1>
+        <Input name="name" placeholder="App name" />
+        <Button type="submit" className="wd-200">
+          Submit
+        </Button>
+        {users?.map((user) => {
+          return <div key={user.id}>{user.name}</div>
+        })}
+      </form>
     </div>
   )
 }
