@@ -1,11 +1,18 @@
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { db } from '@/server/db/db'
-import { User } from '@/server/db/schema'
+import UserInfo, { UserInfoSessionProvider } from './UserInfo'
+import { getServerSession } from '@/server/auth'
+import { redirect } from 'next/navigation'
 
 export default async function Home() {
-  console.info(db.query)
-  const users = await db.select().from(User).limit(10)
+  const session = await getServerSession()
+
+  console.info('session===', session)
+
+  if (!session?.user) {
+    redirect('/api/auth/signin')
+  }
   return (
     <div className="h-screen flex justify-center items-center">
       <form className="w-full max-w-md flex flex-col gap-4">
@@ -14,10 +21,10 @@ export default async function Home() {
         <Button type="submit" className="wd-200">
           Submit
         </Button>
-        {users?.map((user) => {
-          return <div key={user.id}>{user.name}</div>
-        })}
       </form>
+      <UserInfoSessionProvider>
+        <UserInfo />
+      </UserInfoSessionProvider>
     </div>
   )
 }
